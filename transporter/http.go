@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
 	"github.com/Tijanieneye10/go-api/internal/todo"
 )
 
@@ -51,8 +52,6 @@ func NewServer(svc *todo.Service) *Server {
 	return &Server{mux: mux}
 }
 
-
 func (s *Server) Serve() error {
 	return http.ListenAndServe(":8080", s.mux)
 }
-	

@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"log"
-	"net/http"
 
 	"github.com/Tijanieneye10/go-api/internal/todo"
 	"github.com/Tijanieneye10/go-api/transporter"
