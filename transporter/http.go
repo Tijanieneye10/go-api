@@ -64,6 +64,8 @@ func NewServer(svc *todo.Service) *Server {
 			log.Fatal(err)
 		}
 		_, err = w.Write(data)
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
 
 		if err != nil {
 			return
