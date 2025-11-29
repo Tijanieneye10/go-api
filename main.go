@@ -4,51 +4,17 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+
+	"github.com/Tijanieneye10/go-api/internal/todo"
+	"github.com/Tijanieneye10/go-api/transporter"
 )
 
-type TodoItem struct {
-	Item string `json:"item"`
-}
-
 func main() {
-	mux := http.NewServeMux()
+	svc := todo.NewService()
 
-	var todos []string
+	server := transporter.NewServer(svc)
 
-	mux.HandleFunc("GET /todos", func(w http.ResponseWriter, r *http.Request) {
-
-		data, err := json.Marshal(todos)
-		if err != nil {
-			return
-		}
-
-		_, err = w.Write(data)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-	})
-
-	mux.HandleFunc("POST /todos", func(w http.ResponseWriter, r *http.Request) {
-		var t TodoItem
-		err := json.NewDecoder(r.Body).Decode(&t)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		todos = append(todos, t.Item)
-		w.WriteHeader(http.StatusCreated)
-
-		_, err = w.Write([]byte("Todo created successfully!"))
-
-		if err != nil {
-			return
-		}
-	})
-
-	err := http.ListenAndServe(":8080", mux)
-
-	if err != nil {
+	if err := server.Serve(); err != nil {
 		log.Fatal(err)
 	}
 }
