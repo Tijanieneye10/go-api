@@ -7,8 +7,8 @@ type Service struct {
 }
 
 type Item struct {
-	Task   string
-	Status bool
+	Task   string `json:"task"`
+	Status bool   `default:"false"json:"status"`
 }
 
 func NewService() *Service {
@@ -23,9 +23,7 @@ func (s *Service) Add(todo string) error {
 			return errors.New("todo already exist")
 		}
 	}
-	s.todos = append(s.todos, Item{Task: todo,
-		Status: true,
-	})
+	s.todos = append(s.todos, Item{Task: todo})
 	return nil
 }
 
