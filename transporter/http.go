@@ -39,7 +39,13 @@ func NewServer(svc *todo.Service) *Server {
 			log.Fatal(err)
 		}
 
-		svc.Add(t.Item)
+		err = svc.Add(t.Item)
+
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
 		w.WriteHeader(http.StatusCreated)
 
 		_, err = w.Write([]byte("Todo created successfully!"))
