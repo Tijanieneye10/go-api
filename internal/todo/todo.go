@@ -1,6 +1,9 @@
 package todo
 
-import "errors"
+import (
+	"errors"
+	"strings"
+)
 
 type Service struct {
 	todos []Item
@@ -29,4 +32,16 @@ func (s *Service) Add(todo string) error {
 
 func (s *Service) GetAll() []Item {
 	return s.todos
+}
+
+func (s *Service) Search(query string) []Item {
+	var result []Item
+
+	for _, t := range s.todos {
+		if strings.Contains(strings.ToLower(t.Task), strings.ToLower(query)) {
+			result = append(result, t)
+		}
+	}
+
+	return result
 }
