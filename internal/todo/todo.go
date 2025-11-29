@@ -11,7 +11,7 @@ type Service struct {
 
 type Item struct {
 	Task   string `json:"task"`
-	Status bool   `default:"false"json:"status"`
+	Status bool   `default:"false" json:"status"`
 }
 
 func NewService() *Service {
