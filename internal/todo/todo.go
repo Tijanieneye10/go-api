@@ -1,12 +1,13 @@
 package todo
 
 import (
-	"errors"
 	"strings"
+
+	"github.com/Tijanieneye10/go-api/internal/database"
 )
 
 type Service struct {
-	todos []Item
+	db *database.DB
 }
 
 type Item struct {
@@ -14,34 +15,54 @@ type Item struct {
 	Status bool   `default:"false" json:"status"`
 }
 
-func NewService() *Service {
+func NewService(db *database.DB) *Service {
 	return &Service{
-		todos: make([]Item, 0),
+		db: db,
 	}
 }
 
 func (s *Service) Add(todo string) error {
-	for _, t := range s.todos {
-		if t.Task == todo {
-			return errors.New("todo already exist")
-		}
+	_, err := s.db.Sqlite.Exec("INSERT INTO todos (task, status) VALUES (?, ?)", todo, false)
+	if err != nil {
+		return err
 	}
-	s.todos = append(s.todos, Item{Task: todo})
 	return nil
 }
 
-func (s *Service) GetAll() []Item {
-	return s.todos
-}
+func (s *Service) GetAll() ([]Item, error) {
+	rows, err := s.db.Sqlite.Query("SELECT task, status FROM todos")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-func (s *Service) Search(query string) []Item {
-	var result []Item
-
-	for _, t := range s.todos {
-		if strings.Contains(strings.ToLower(t.Task), strings.ToLower(query)) {
-			result = append(result, t)
+	var items []Item
+	for rows.Next() {
+		var item Item
+		if err := rows.Scan(&item.Task, &item.Status); err != nil {
+			return nil, err
 		}
+		items = append(items, item)
 	}
 
-	return result
+	return items, rows.Err()
+}
+
+func (s *Service) Search(query string) ([]Item, error) {
+	rows, err := s.db.Sqlite.Query("SELECT task, status FROM todos WHERE LOWER(task) LIKE ?", "%"+strings.ToLower(query)+"%")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var items []Item
+	for rows.Next() {
+		var item Item
+		if err := rows.Scan(&item.Task, &item.Status); err != nil {
+			return nil, err
+		}
+		items = append(items, item)
+	}
+
+	return items, rows.Err()
 }

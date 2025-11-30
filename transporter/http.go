@@ -21,7 +21,12 @@ func NewServer(svc *todo.Service) *Server {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /todos", func(w http.ResponseWriter, r *http.Request) {
-		data, err := json.Marshal(svc.GetAll())
+		items, err := svc.GetAll()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		data, err := json.Marshal(items)
 		if err != nil {
 			return
 		}
@@ -57,7 +62,11 @@ func NewServer(svc *todo.Service) *Server {
 
 	mux.HandleFunc("GET /todos/search", func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query().Get("q")
-		results := svc.Search(query)
+		results, err := svc.Search(query)
+
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		data, err := json.Marshal(results)
 		if err != nil {
